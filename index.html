@@ -1,75 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menu Page</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background-color: #333;
-            color: white;
-            padding: 10px 0;
-            text-align: center;
-        }
-        nav {
-            display: flex;
-            justify-content: center;
-            background-color: #444;
-            padding: 10px;
-        }
-        nav a {
-            color: white;
-            text-decoration: none;
-            margin: 0 15px;
-            font-size: 18px;
-        }
-        nav a:hover {
-            text-decoration: underline;
-        }
-        section {
-            padding: 20px;
-            text-align: center;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Product Catalog</title>
+  <style>
+    body { font-family: Arial, sans-serif; }
+    .product-card {
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin: 10px;
+      border-radius: 10px;
+      width: 300px;
+      float: left;
+    }
+    .product-card img {
+      max-width: 100%;
+      height: auto;
+    }
+    .product-card .price {
+      font-weight: bold;
+      color: green;
+    }
+  </style>
 </head>
 <body>
+  <h1>Our Products</h1>
+  <div id="product-container"></div>
 
-<header>
-    <h1>My Menu Page</h1>
-</header>
+  <script>
+    fetch('products.json')
+      .then(res => res.json())
+      .then(json => {
+        const container = document.getElementById('product-container');
+        const basePath = json.imagePathPrefix;
 
-<nav>
-    <a href="#home">Home</a>
-    <a href="#services">Services</a>
-    <a href="#about">About</a>
-    <a href="#contact">Contact</a>
-</nav>
+        json.data.forEach(item => {
+          const product = item.products[0]; // use the first product
+          const imageKey = Object.values(item.imgs || {})[0] || '';
+          const imageUrl = basePath + imageKey;
 
-<section id="home">
-    <h2>Welcome to Our Website!</h2>
-    <p>This is the home page of the menu.</p>
-</section>
-
-<section id="services">
-    <h2>Our Services</h2>
-    <p>Explore the amazing services we offer.</p>
-</section>
-
-<section id="about">
-    <h2>About Us</h2>
-    <p>Learn more about our company and our mission.</p>
-</section>
-
-<section id="contact">
-    <h2>Contact Us</h2>
-    <p>Get in touch with us for more information.</p>
-</section>
-
+          const card = document.createElement('div');
+          card.className = 'product-card';
+          card.innerHTML = `
+            <img src="${imageUrl}" alt="${product.name}">
+            <h2>${product.name}</h2>
+            <p>${item.desc.replace(/\\n/g, '<br>')}</p>
+            <p class="price">$${product.price.toFixed(2)}</p>
+          `;
+          container.appendChild(card);
+        });
+      })
+      .catch(err => {
+        console.error('Error loading products:', err);
+      });
+  </script>
 </body>
 </html>
